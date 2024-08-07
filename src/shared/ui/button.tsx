@@ -13,7 +13,6 @@ export const Button: FC<ButtonProps> = ({
     onClick,
     isDisabled,
 }) => {
-    console.log(isDisabled)
     return (
         <button
             type={type}

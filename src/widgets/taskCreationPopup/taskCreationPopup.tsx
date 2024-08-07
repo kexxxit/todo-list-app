@@ -30,28 +30,33 @@ const TaskCreationPopup: FC<TaskCreationPopupProps> = ({ onClose }) => {
 
     return (
         <div className='w-full h-full bg-black/[.3] fixed top-0 left-0 flex items-center justify-center'>
-            <form
-                className='w-100 h-auto py-16 px-5
-             bg-[#DCE0E1] flex flex-col rounded-[20px]'
-                onSubmit={handleSubmit}>
-                <input
-                    className='w-full mb-2'
-                    type='text'
-                    value={taskName}
-                    onChange={(e) => setTaskName(e.target.value)}
-                    placeholder='Название задачи'
-                />
-                <input
-                    className='w-full mb-2'
-                    type='text'
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder='Текст задачи'
-                />
-                <Button type='submit' onClick={() => {}} isDisabled={false}>
-                    Создать задачу
-                </Button>
-            </form>
+            <div>
+                <div className='flex justify-end '>
+                    <span onClick={() => onClose()} className='cursor-pointer'>X</span>
+                </div>
+                <form
+                    className='w-100 h-auto py-16 px-5 
+                        bg-[#DCE0E1] flex flex-col rounded-[20px]'
+                    onSubmit={handleSubmit}>
+                    <input
+                        className='w-full mb-2'
+                        type='text'
+                        value={taskName}
+                        onChange={(e) => setTaskName(e.target.value)}
+                        placeholder='Название задачи'
+                    />
+                    <input
+                        className='w-full mb-2'
+                        type='text'
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder='Текст задачи'
+                    />
+                    <Button type='submit' onClick={() => {}} isDisabled={false}>
+                        Создать задачу
+                    </Button>
+                </form>
+            </div>
         </div>
     )
 }

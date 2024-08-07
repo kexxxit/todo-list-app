@@ -10,15 +10,16 @@ class TaskStore {
         makeAutoObservable(this)
     }
 
-    addTask(task: Task, parentId?: string) {
+    addTask = (task: Task, parentId?: string) => {
         if (parentId) {
             this.findTaskById(parentId)?.subtasks.push(task)
+            this.tasks = JSON.parse(JSON.stringify(this.tasks))
         } else {
             this.tasks.push(task)
         }
     }
 
-    toggleTaskCompletion(id: string) {
+    toggleTaskCompletion = (id: string) => {
         const task = this.findTaskById(id)
         if (task) {
             const copy: Task = JSON.parse(JSON.stringify(task))
@@ -28,7 +29,7 @@ class TaskStore {
         }
     }
 
-    toggleTaskExpansion(id: string) {
+    toggleTaskExpansion = (id: string) => {
         const task = this.findTaskById(id)
         if (task) {
             const copy: Task = JSON.parse(JSON.stringify(task))
@@ -37,19 +38,27 @@ class TaskStore {
         }
     }
 
-    deleteTask(id: string) {
+    deleteTask = (id: string) => {
         this.tasks = this.tasks.filter((task) => task.id !== id)
         this.tasks.forEach((task) => this.deleteSubtask(task, id))
     }
 
-    setActiveTask(id: string | undefined) {
-        this.activeTaskId = id
+    setActiveTask = (id: string | undefined) => {
+        if (id && id === this.activeTaskId) {
+            this.activeTaskId = undefined
+        } else this.activeTaskId = id
     }
 
-    private findTaskById(
+    getActiveTask = () => {
+        return this.activeTaskId
+            ? this.findTaskById(this.activeTaskId)
+            : undefined
+    }
+
+    private findTaskById = (
         id: string,
         tasks: Task[] = this.tasks
-    ): Task | undefined {
+    ): Task | undefined => {
         for (const task of tasks) {
             if (task.id === id) {
                 return task
@@ -64,7 +73,7 @@ class TaskStore {
         return undefined
     }
 
-    private updateSubtasksCompletion(task: Task) {
+    private updateSubtasksCompletion = (task: Task) => {
         task.subtasks.forEach((subtask) => {
             const copy: Task = JSON.parse(JSON.stringify(subtask))
             copy.completed = !copy.completed
@@ -74,19 +83,23 @@ class TaskStore {
         })
     }
 
-    private deleteSubtask(task: Task, id: string) {
+    private deleteSubtask = (task: Task, id: string) => {
         task.subtasks = task.subtasks.filter((subtask) => subtask.id !== id)
         task.subtasks.forEach((subtask) => this.deleteSubtask(subtask, id))
     }
 
-    private replaceTask(id: string, newTask: Task) {
-        this.tasks = this.tasks.map(task => task.id === id ? newTask : task)
-        this.tasks.forEach(task => this.replaceSubtask(task, id, newTask))
+    private replaceTask = (id: string, newTask: Task) => {
+        this.tasks = this.tasks.map((task) => (task.id === id ? newTask : task))
+        this.tasks.forEach((task) => this.replaceSubtask(task, id, newTask))
     }
 
-    private replaceSubtask(task: Task, id: string, newTask: Task) {
-        task.subtasks = task.subtasks.map(subtask => subtask.id === id ? newTask : subtask)
-        task.subtasks.forEach(subtask => this.replaceSubtask(subtask, id, newTask))
+    private replaceSubtask = (task: Task, id: string, newTask: Task) => {
+        task.subtasks = task.subtasks.map((subtask) =>
+            subtask.id === id ? newTask : subtask
+        )
+        task.subtasks.forEach((subtask) =>
+            this.replaceSubtask(subtask, id, newTask)
+        )
     }
 }
 

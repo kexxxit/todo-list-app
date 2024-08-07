@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite'
 import taskStore from '../../app/stores/TaskStore'
 import { Task } from '../types/Task'
 import { Button } from './button'
+import { IoCloseOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5'
+import { useStores } from '../../app/RootStoreContext'
 
 interface TaskItemProps {
     task: Task
@@ -10,37 +12,72 @@ interface TaskItemProps {
 }
 
 const TaskItem: FC<TaskItemProps> = ({ task, level }) => {
+    const {
+        tasks: {
+            activeTaskId,
+            deleteTask,
+            toggleTaskExpansion,
+            setActiveTask,
+            toggleTaskCompletion,
+        },
+    } = useStores()
+
     const handleToggleCompletion = () => {
-        taskStore.toggleTaskCompletion(task.id)
+        toggleTaskCompletion(task.id)
     }
 
     const handleToggleExpansion = () => {
-        taskStore.toggleTaskExpansion(task.id)
-        taskStore.setActiveTask(task.id)
+        toggleTaskExpansion(task.id)
+    }
+
+    const handleSetTaskActive = () => {
+        setActiveTask(task.id)
     }
 
     const handleDelete = () => {
-        taskStore.activeTaskId === task.id && taskStore.setActiveTask(undefined)
-        taskStore.deleteTask(task.id)
+        activeTaskId === task.id && setActiveTask(undefined)
+        deleteTask(task.id)
     }
 
     return (
-        <div
-            className={
-                (task.id === taskStore.activeTaskId ? 'bg-[#DCE0E1]' : '') +
-                ' rounded-[8px] px-4'
-            }
-            style={{ marginLeft: level * 2 }}>
-            <span className='cursor-pointer' onClick={handleToggleExpansion}>{task.taskName}</span>
-            <input
-                type='checkbox'
-                checked={task.completed}
-                onChange={handleToggleCompletion}
-            />
-            <Button onClick={handleDelete} isDisabled={false} type='button'>
-                Delete
-            </Button>
-
+        <>
+            <div
+                className={
+                    (task.id === taskStore.activeTaskId ? 'bg-[#DCE0E1]' : '') +
+                    ' rounded-[8px] px-4 grid grid-cols-[20px_1fr_50px] items-center'
+                }
+                style={{ marginLeft: level * 10 }}>
+                <div>
+                    {task.subtasks.length > 0 &&
+                        (task.expanded ? (
+                            <IoChevronUp
+                                className='cursor-pointer'
+                                onClick={handleToggleExpansion}
+                            />
+                        ) : (
+                            <IoChevronDown
+                                className='cursor-pointer'
+                                onClick={handleToggleExpansion}
+                            />
+                        ))}
+                </div>
+                <span
+                    className='cursor-pointer overflow-hidden text-ellipsis'
+                    onClick={handleSetTaskActive}>
+                    {task.taskName}
+                </span>
+                <div className='flex justify-end'>
+                    <input
+                        type='checkbox'
+                        checked={task.completed}
+                        onChange={handleToggleCompletion}
+                    />
+                    <IoCloseOutline
+                        className='cursor-pointer'
+                        onClick={handleDelete}
+                    />
+                </div>
+            </div>
             {task.expanded && task.subtasks.length > 0 && (
                 <div className=''>
                     {task.subtasks.map((subtask) => (
@@ -52,7 +89,7 @@ const TaskItem: FC<TaskItemProps> = ({ task, level }) => {
                     ))}
                 </div>
             )}
-        </div>
+        </>
     )
 }
 
