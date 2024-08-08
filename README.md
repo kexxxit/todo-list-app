@@ -1,14 +1,19 @@
 # To Do List App
-
+Приложение для управления задачами с возможностью создания вложенных подзадач.
 ## Установка
 
 ### `1. Клонируйте репозиторий:`
    ```bash
-   git clone https://github.com/ваш-репозиторий/task-manager.git
-   cd task-manager
-
+   git clone https://github.com/kexxxit/todo-list-app.git
+   ```
+```bash
+cd task-manager
+```
 ### `2. Установите зависимости:`
-    npm install
-
+```bash
+npm install
+```
 ### `3. Запустите проект:`
-    npm start
+```bash
+npm start
+```
