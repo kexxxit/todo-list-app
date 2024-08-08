@@ -125,21 +125,21 @@ class TaskStore {
             ) {
                 results.push(task)
             }
-            results.push(...this.searchSubtasksByName(task, this.search))
+            // results.push(...this.searchSubtasksByName(task, this.search))
         })
         this.searchedTasks = results
     }
 
-    private searchSubtasksByName = (task: Task, name: string): Task[] => {
-        const results: Task[] = []
-        task.subtasks.forEach((subtask) => {
-            if (subtask.taskName.toLowerCase().includes(name.toLowerCase())) {
-                results.push(subtask)
-            }
-            results.push(...this.searchSubtasksByName(subtask, name))
-        })
-        return results
-    }
+    // private searchSubtasksByName = (task: Task, name: string): Task[] => {
+    //     const results: Task[] = []
+    //     task.subtasks.forEach((subtask) => {
+    //         if (subtask.taskName.toLowerCase().includes(name.toLowerCase())) {
+    //             results.push(subtask)
+    //         }
+    //         results.push(...this.searchSubtasksByName(subtask, name))
+    //     })
+    //     return results
+    // }
 
     private findTaskById = (
         id: string,
