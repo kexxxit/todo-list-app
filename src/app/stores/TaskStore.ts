@@ -3,7 +3,10 @@ import { Task } from '../../shared/types/Task'
 
 class TaskStore {
     tasks: Task[] = localStorage.tasks ? JSON.parse(localStorage.tasks) : []
-
+    search: string = ''
+    searchedTasks: Task[] = localStorage.searchedTasks
+        ? JSON.parse(localStorage.searchedTasks)
+        : []
     activeTaskId: string | undefined =
         localStorage.activeTaskId && this.tasks.length > 0
             ? JSON.parse(localStorage.activeTaskId)
@@ -19,6 +22,9 @@ class TaskStore {
                 if (tasks.length === 0) {
                     localStorage.removeItem('task')
                     localStorage.removeItem('activeTaskId')
+                }
+                if (this.search.trim() !== '') {
+                    this.setSearchTasks()
                 }
             }
         )
@@ -36,6 +42,17 @@ class TaskStore {
                 }
             }
         )
+
+        reaction(
+            () => this.search,
+            (search) => {
+                if (search.trim() === '') {
+                    this.searchedTasks = this.tasks
+                } else {
+                    this.setSearchTasks()
+                }
+            }
+        )
     }
 
     addTask = (task: Task, parentId?: string) => {
@@ -45,6 +62,10 @@ class TaskStore {
         } else {
             this.tasks = [...this.tasks, task]
         }
+    }
+
+    setSearch = (text: string) => {
+        this.search = text
     }
 
     toggleTaskCompletion = (id: string) => {
@@ -96,6 +117,30 @@ class TaskStore {
             : undefined
     }
 
+    private setSearchTasks = () => {
+        const results: Task[] = []
+        this.tasks.forEach((task) => {
+            if (
+                task.taskName.toLowerCase().includes(this.search.toLowerCase())
+            ) {
+                results.push(task)
+            }
+            results.push(...this.searchSubtasksByName(task, this.search))
+        })
+        this.searchedTasks = results
+    }
+
+    private searchSubtasksByName = (task: Task, name: string): Task[] => {
+        const results: Task[] = []
+        task.subtasks.forEach((subtask) => {
+            if (subtask.taskName.toLowerCase().includes(name.toLowerCase())) {
+                results.push(subtask)
+            }
+            results.push(...this.searchSubtasksByName(subtask, name))
+        })
+        return results
+    }
+
     private findTaskById = (
         id: string,
         tasks: Task[] = this.tasks
@@ -135,7 +180,9 @@ class TaskStore {
             }
             return !subtask.completed
         })
-        task.subtasks.forEach((subtask) => this.deleteCompletedSubtasks(subtask))
+        task.subtasks.forEach((subtask) =>
+            this.deleteCompletedSubtasks(subtask)
+        )
     }
 
     private containsActiveTask = (task: Task): boolean => {
