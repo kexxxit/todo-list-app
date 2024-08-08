@@ -1,13 +1,41 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, reaction } from 'mobx'
 import { Task } from '../../shared/types/Task'
 
 class TaskStore {
-    tasks: Task[] = []
+    tasks: Task[] = localStorage.tasks ? JSON.parse(localStorage.tasks) : []
 
-    activeTaskId: string | undefined = undefined
+    activeTaskId: string | undefined =
+        localStorage.activeTaskId && this.tasks.length > 0
+            ? JSON.parse(localStorage.activeTaskId)
+            : undefined
 
     constructor() {
         makeAutoObservable(this)
+
+        reaction(
+            () => this.tasks,
+            (tasks) => {
+                localStorage.setItem('tasks', JSON.stringify(tasks))
+                if (tasks.length === 0) {
+                    localStorage.removeItem('task')
+                    localStorage.removeItem('activeTaskId')
+                }
+            }
+        )
+
+        reaction(
+            () => this.activeTaskId,
+            (activeTaskId) => {
+                if (activeTaskId) {
+                    localStorage.setItem(
+                        'activeTaskId',
+                        JSON.stringify(activeTaskId)
+                    )
+                } else {
+                    localStorage.removeItem('activeTaskId')
+                }
+            }
+        )
     }
 
     addTask = (task: Task, parentId?: string) => {
@@ -15,7 +43,8 @@ class TaskStore {
             this.findTaskById(parentId)?.subtasks.push(task)
             this.tasks = JSON.parse(JSON.stringify(this.tasks))
         } else {
-            this.tasks.push(task)
+            // this.tasks.push(task)
+            this.tasks = [...this.tasks, task]
         }
     }
 
@@ -23,9 +52,10 @@ class TaskStore {
         const task = this.findTaskById(id)
         if (task) {
             const copy: Task = JSON.parse(JSON.stringify(task))
-            copy.completed = !copy.completed
+            const completed = !copy.completed
+            copy.completed = completed
             this.replaceTask(id, copy)
-            this.updateSubtasksCompletion(task)
+            this.updateSubtasksCompletion(copy, completed)
         }
     }
 
@@ -73,13 +103,12 @@ class TaskStore {
         return undefined
     }
 
-    private updateSubtasksCompletion = (task: Task) => {
+    private updateSubtasksCompletion = (task: Task, completed: boolean) => {
         task.subtasks.forEach((subtask) => {
             const copy: Task = JSON.parse(JSON.stringify(subtask))
-            copy.completed = !copy.completed
+            copy.completed = completed
             this.replaceTask(copy.id, copy)
-            subtask.completed = task.completed
-            this.updateSubtasksCompletion(subtask)
+            this.updateSubtasksCompletion(copy, completed)
         })
     }
 
@@ -104,4 +133,5 @@ class TaskStore {
 }
 
 const taskStore = new TaskStore()
+
 export default taskStore

@@ -45,9 +45,8 @@ const TaskCreationPopup: FC<TaskCreationPopupProps> = ({ onClose }) => {
                         onChange={(e) => setTaskName(e.target.value)}
                         placeholder='Название задачи'
                     />
-                    <input
+                    <textarea
                         className='w-full mb-2'
-                        type='text'
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder='Текст задачи'

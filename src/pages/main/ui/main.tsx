@@ -37,8 +37,8 @@ export const Main = observer(() => {
                 </div>
 
                 <div className='bg-[#DCE0E1] h-full p-5'>
-                    <h2>{activeTask?.taskName}</h2>
-                    <h4>{activeTask?.text}</h4>
+                    <h2 className='text-xl font-semibold'>{activeTask?.taskName}</h2>
+                    <h4 className='text-[16px]'>{activeTask?.text}</h4>
                 </div>
             </div>
         </>

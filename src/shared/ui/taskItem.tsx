@@ -2,7 +2,6 @@ import React, { FC } from 'react'
 import { observer } from 'mobx-react-lite'
 import taskStore from '../../app/stores/TaskStore'
 import { Task } from '../types/Task'
-import { Button } from './button'
 import { IoCloseOutline, IoChevronUp, IoChevronDown } from 'react-icons/io5'
 import { useStores } from '../../app/RootStoreContext'
 
@@ -62,7 +61,10 @@ const TaskItem: FC<TaskItemProps> = ({ task, level }) => {
                         ))}
                 </div>
                 <span
-                    className='cursor-pointer overflow-hidden text-ellipsis'
+                    className={
+                        'font-bold cursor-pointer overflow-hidden text-ellipsis ' +
+                        (level > 0 && 'font-normal')
+                    }
                     onClick={handleSetTaskActive}>
                     {task.taskName}
                 </span>
