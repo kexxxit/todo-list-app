@@ -18,7 +18,7 @@ export const Button: FC<ButtonProps> = ({
             type={type}
             disabled={isDisabled}
             className='bg-orange-400 hover:bg-orange-500 transition-all 
-                rounded-full font-bold text-white px-[10px] py-[1px]'
+                rounded-full font-medium text-white px-[10px] py-[1px]'
             onClick={onClick}>
             {children}
         </button>

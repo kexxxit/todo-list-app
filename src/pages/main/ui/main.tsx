@@ -9,7 +9,7 @@ import { useStores } from '../../../app/RootStoreContext'
 export const Main = observer(() => {
     const [popupIsOpen, setPopupIsOpen] = useState<boolean>(false)
     const {
-        tasks: { activeTaskId, getActiveTask },
+        tasks: { activeTaskId, getActiveTask, deleteCompletedTasks },
     } = useStores()
     const [activeTask, setActiveTask] = useState<Task | undefined>(undefined)
 
@@ -25,19 +25,31 @@ export const Main = observer(() => {
 
             <div className='grid grid-cols-2 h-full'>
                 <div className='p-5'>
-                    <Button
-                        type='button'
-                        onClick={() => {
-                            setPopupIsOpen(!popupIsOpen)
-                        }}
-                        isDisabled={false}>
-                        +
-                    </Button>
+                    <div className='flex justify-between'>
+                        <Button
+                            type='button'
+                            onClick={() => {
+                                setPopupIsOpen(!popupIsOpen)
+                            }}
+                            isDisabled={false}>
+                            +
+                        </Button>
+                        <Button
+                            type='button'
+                            onClick={() => {
+                                deleteCompletedTasks()
+                            }}
+                            isDisabled={false}>
+                            Удалить отмеченные
+                        </Button>
+                    </div>
                     <TaskList />
                 </div>
 
                 <div className='bg-[#DCE0E1] h-full p-5'>
-                    <h2 className='text-xl font-semibold'>{activeTask?.taskName}</h2>
+                    <h2 className='text-xl font-semibold'>
+                        {activeTask?.taskName}
+                    </h2>
                     <h4 className='text-[16px]'>{activeTask?.text}</h4>
                 </div>
             </div>

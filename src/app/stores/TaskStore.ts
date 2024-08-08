@@ -43,7 +43,6 @@ class TaskStore {
             this.findTaskById(parentId)?.subtasks.push(task)
             this.tasks = JSON.parse(JSON.stringify(this.tasks))
         } else {
-            // this.tasks.push(task)
             this.tasks = [...this.tasks, task]
         }
     }
@@ -71,6 +70,18 @@ class TaskStore {
     deleteTask = (id: string) => {
         this.tasks = this.tasks.filter((task) => task.id !== id)
         this.tasks.forEach((task) => this.deleteSubtask(task, id))
+    }
+
+    deleteCompletedTasks = () => {
+        this.tasks
+            .filter((task) => task.completed)
+            .forEach((task) => {
+                if (this.containsActiveTask(task)) {
+                    this.activeTaskId = undefined
+                }
+            })
+        this.tasks = this.tasks.filter((task) => !task.completed)
+        this.tasks.forEach((task) => this.deleteCompletedSubtasks(task))
     }
 
     setActiveTask = (id: string | undefined) => {
@@ -115,6 +126,28 @@ class TaskStore {
     private deleteSubtask = (task: Task, id: string) => {
         task.subtasks = task.subtasks.filter((subtask) => subtask.id !== id)
         task.subtasks.forEach((subtask) => this.deleteSubtask(subtask, id))
+    }
+
+    private deleteCompletedSubtasks = (task: Task) => {
+        task.subtasks = task.subtasks.filter((subtask) => {
+            if (subtask.completed && this.containsActiveTask(subtask)) {
+                this.activeTaskId = undefined
+            }
+            return !subtask.completed
+        })
+        task.subtasks.forEach((subtask) => this.deleteCompletedSubtasks(subtask))
+    }
+
+    private containsActiveTask = (task: Task): boolean => {
+        if (task.id === this.activeTaskId) {
+            return true
+        }
+        for (const subtask of task.subtasks) {
+            if (this.containsActiveTask(subtask)) {
+                return true
+            }
+        }
+        return false
     }
 
     private replaceTask = (id: string, newTask: Task) => {
